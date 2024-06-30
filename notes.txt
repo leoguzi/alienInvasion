@@ -1,4 +1,4 @@
-// parametros de dificuldade: numero de canhões, velocidade de descida das naves e quantidade de naves.
+// parametros de dificuldade: numero de foguetes, velocidade de descida das naves e quantidade de naves.
 
 // recarregar canhão (tempo?)
 

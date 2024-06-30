@@ -3,14 +3,18 @@
 #include <windows.h>
 #include <time.h>
 #include <stdlib.h>
+#include <conio.h>
 
-int x, missao = 0;
-int origemCanhao0 = 53, origemCanhao1 = 93;
-int contaRefem = 10;
-int contaResgatado = 0;
-int posicaoHelice = 0;
-int posicaRoda[2] = {0, 0};
-int canhaoMovendo[2] = {0, 0};
+enum PosicaoCanhao
+{
+    ZERO_GRAUS = 0,
+    QUARENTA_CINCO_GRAUS = 45,
+    NOVENTA_GRAUS = 90,
+    CENTO_E_TRINTA_CINCO_GRAUS = 135,
+    CENTO_E_OITENTA_GRAUS = 180
+};
+
+int origemCanhao = 53;
 
 // Fun��o gotoxy
 void gotoxy(int x, int y)
@@ -55,116 +59,33 @@ void explode_bomba(int x, int y)
     gotoxy(x, y + 2);
     printf(" ");
 }
-void helicopteroE2D(int x, int y)
-{
-    gotoxy(x + 3, y);
-    switch (posicaoHelice)
-    {
-    case 0:
-        printf("______+______\n");
-        break;
-    case 1:
-        printf(" _____+_____ \n");
-        break;
-    case 2:
-        printf("  ____+____  \n");
-        break;
-    case 3:
-        printf("   ___+___   \n");
-        break;
-    case 4:
-        printf("    __+__    \n");
-        break;
-    case 5:
-        printf("     _+_    \n");
-        break;
-    case 6:
-        printf("    __+__    \n");
-        break;
-    case 7:
-        printf("   ___+___   \n");
-        break;
-    case 8:
-        printf("  ____+____  \n");
-        break;
-    case 9:
-        printf(" _____+_____ \n");
-        break;
-    case 10:
-        printf("______+______\n");
-        break;
-    }
-    posicaoHelice = (posicaoHelice < 10 ? posicaoHelice + 1 : 1);
-    gotoxy(x + 7, y + 1);
-    printf("__|__\n");
-    gotoxy(x, y + 2);
-    printf("/\\====/     \\\n");
-    gotoxy(x, y + 3);
-    printf("      \\      )\n");
-    gotoxy(x, y + 4);
-    printf("       _+@_+_\n");
-}
-void helicopteroD2E(int x, int y)
-{
-    gotoxy(x - 2, y);
-    switch (posicaoHelice)
-    {
-    case 0:
-        printf("______+______\n");
-        break;
-    case 1:
-        printf(" _____+_____ \n");
-        break;
-    case 2:
-        printf("  ____+____  \n");
-        break;
-    case 3:
-        printf("   ___+___   \n");
-        break;
-    case 4:
-        printf("    __+__    \n");
-        break;
-    case 5:
-        printf("     _+_    \n");
-        break;
-    case 6:
-        printf("    __+__    \n");
-        break;
-    case 7:
-        printf("   ___+___   \n");
-        break;
-    case 8:
-        printf("  ____+____  \n");
-        break;
-    case 9:
-        printf(" _____+_____ \n");
-        break;
-    case 10:
-        printf("______+______\n");
-        break;
-    }
-    posicaoHelice = (posicaoHelice < 10 ? posicaoHelice + 1 : 1);
-    gotoxy(x + 2, y + 1);
-    printf("__|__\n");
-    gotoxy(x + 1, y + 2);
-    printf("/     \\====/\\\n");
-    gotoxy(x, y + 3);
-    printf("(      /\n");
-    gotoxy(x + 2, y + 4);
-    printf("_+__+_       \n");
-}
-void apaga_helicopteroE2D(int x, int y)
+
+void desenhaNave(int x, int y)
 {
     gotoxy(x, y);
-    printf("               \n");
+    printf("     _     \n");
     gotoxy(x, y + 1);
-    printf("               \n");
+    printf("   _( )_   \n");
     gotoxy(x, y + 2);
-    printf("               \n");
+    printf("  /     \\  \n");
     gotoxy(x, y + 3);
-    printf("               \n");
+    printf(" /_______\\ \n");
     gotoxy(x, y + 4);
-    printf("               \n");
+    printf("   |   |   \n");
+}
+
+void apagaNave(int x, int y)
+{
+    gotoxy(x, y);
+    printf("           \n");
+    gotoxy(x, y + 1);
+    printf("           \n");
+    gotoxy(x, y + 2);
+    printf("           \n");
+    gotoxy(x, y + 3);
+    printf("           \n");
+    gotoxy(x, y + 4);
+    printf("           \n");
 }
 
 void bomba(int x, int y, int posicao)
@@ -190,41 +111,35 @@ void bomba(int x, int y, int posicao)
     }
 }
 
-void inicializaCanhao(int x, int y, int canhao)
+void desenhaCanhao(int x, int y, enum PosicaoCanhao posicao)
 {
-    int posicao;
-    char roda = 'O';
-    time_t t;
-    if (canhaoMovendo[canhao])
-    {
-        switch (posicaRoda[canhao])
-        {
-        case 0:
-            roda = '|';
-            break;
-        case 1:
-            roda = '/';
-            break;
-        case 2:
-            roda = '-';
-            break;
-        case 3:
-            roda = '\\';
-            break;
-        }
-        posicaRoda[canhao] = (posicaRoda[canhao] < 3 ? posicaRoda[canhao] + 1 : 0);
-    }
-    gotoxy(x, y + 1);
-    printf(" ___+--+___");
-    gotoxy(x, y + 2);
-    printf("/          \\");
-    gotoxy(x, y + 3);
-    printf("\\          /");
-    gotoxy(x, y + 4);
-    printf(" -%c-%c--%c-%c-", roda, roda, roda, roda);
     gotoxy(x, y);
-    printf("     ||");
+    switch (posicao)
+    {
+    case ZERO_GRAUS:
+        printf(">");
+        break;
+    case QUARENTA_CINCO_GRAUS:
+        printf("/");
+        break;
+    case NOVENTA_GRAUS:
+        printf("|");
+        break;
+    case CENTO_E_TRINTA_CINCO_GRAUS:;
+        printf("\\");
+        break;
+    case CENTO_E_OITENTA_GRAUS:
+        printf("<");
+        break;
+    }
 }
+
+void apagaCanhao(int x, int y)
+{
+    gotoxy(x, y);
+    printf("       \n");
+}
+
 void canhaoAtira(int x, int y)
 {
     int posicao;
@@ -260,181 +175,108 @@ void canhaoAtira(int x, int y)
     }
 }
 
-void apagaCanhao(int x, int y)
-{
-    int posicao;
-    time_t t;
-    gotoxy(x, y + 1);
-    printf("           ");
-    gotoxy(x, y + 2);
-    printf("            ");
-    gotoxy(x, y + 3);
-    printf("            ");
-    gotoxy(x, y + 4);
-    printf("           ");
-    gotoxy(x, y);
-    printf("       ");
-}
-
-void moveCanhaoD2E(int origem, int Destino, int canhao)
-{
-    for (int x = origem; x > Destino;)
+int pressionouDireita(int posicaoAtual){
+    switch (posicaoAtual)
     {
-        Sleep(50);
-        apagaCanhao(x, 20);
-        inicializaCanhao(--x, 20, canhao);
+    case ZERO_GRAUS:
+        return ZERO_GRAUS;
+    case QUARENTA_CINCO_GRAUS:
+        return ZERO_GRAUS;
+    case NOVENTA_GRAUS:
+        return QUARENTA_CINCO_GRAUS;
+    case CENTO_E_TRINTA_CINCO_GRAUS:
+        return NOVENTA_GRAUS;
+    case CENTO_E_OITENTA_GRAUS:
+        return CENTO_E_TRINTA_CINCO_GRAUS;
     }
 }
 
-void moveCanhaoE2D(int origem, int Destino, int canhao)
-{
-    for (int x = origem; x <= Destino;)
+int pressionouEsquerda(int posicaoAtual){
+    switch (posicaoAtual)
     {
-        Sleep(50);
-        apagaCanhao(x, 20);
-        inicializaCanhao(++x, 20, canhao);
+    case ZERO_GRAUS:
+        return QUARENTA_CINCO_GRAUS;
+    case QUARENTA_CINCO_GRAUS:
+        return NOVENTA_GRAUS;
+    case NOVENTA_GRAUS:
+        return CENTO_E_TRINTA_CINCO_GRAUS;
+    case CENTO_E_TRINTA_CINCO_GRAUS:
+        return CENTO_E_OITENTA_GRAUS;
+    case CENTO_E_OITENTA_GRAUS:
+        return CENTO_E_OITENTA_GRAUS;
     }
 }
 
-void plataformaE(void)
-{
-    int linha;
-    gotoxy(0, 7);
-    printf("----------+\n");
-    gotoxy(0, 8);
-    printf("|         /\n");
-    for (linha = 9; linha < 25; linha++)
-    {
-        gotoxy(0, linha);
-        printf("|        |\n");
-    }
-}
-void desenhaRefens(void)
-{
-    gotoxy(0, 6);
-    printf("          ");
-    for (int i = 0; i < contaRefem; i++)
-    {
-        gotoxy(0 + i, 6);
-        printf("@");
-    }
-}
-
-void desenhaResgatados(void)
-{
-    for (int i = 0; i < contaResgatado; i++)
-    {
-        gotoxy(109 + i, 6);
-        printf("@");
-    }
-}
-void plataformaD(void)
-{
-    int linha;
-    gotoxy(108, 7);
-    printf("+-----------\n");
-    gotoxy(109, 8);
-    printf("\\         \n");
-    for (linha = 9; linha < 25; linha++)
-    {
-        gotoxy(109, linha);
-        printf(" |        | \n");
-    }
-}
-
-void ponte(void)
-{
-    gotoxy(30, 25);
-    printf("+-----------------------+\n");
-    gotoxy(30, 26);
-    printf("|         ---           |\n");
-    gotoxy(30, 27);
-    printf("|        /   \\          |\n");
-    gotoxy(30, 28);
-    printf("|       /     \\         |\n");
-    gotoxy(30, 29);
-    printf("|      /       \\        |\n");
-}
-void deposito(void)
-{
-    gotoxy(0, 20);
-    printf("|\\|\\|\\|\\|\\|\\|\\|\\|\\|\\|\\");
-    gotoxy(0, 21);
-    printf("|                     |");
-    gotoxy(0, 22);
-    printf("|       +----+        |");
-    gotoxy(0, 23);
-    printf("|       |    |        |");
-    gotoxy(0, 24);
-    printf("|       |    |        |");
-}
 int main()
 {
-    int coluna = 5;
-    int linha = 3;
-    int k = 0;
+    enum PosicaoCanhao posicao = NOVENTA_GRAUS;
+    int x = 59; // Posição inicial x do canhão
+    int y = 27; // Posição inicial y do canhao
+    int linha, coluna = 0;
+    int numeroFoguetes = 5;
+    int numeroNaves = 5;
+
     system("cls");
-    gotoxy(0, 25);
+
+    gotoxy(0, 28);
     for (coluna = 0; coluna < 120; coluna++)
     {
-        printf("^");
-    }
-    inicializaCanhao(origemCanhao0, 20, 0);
-    inicializaCanhao(origemCanhao1, 20, 1);
-    ponte();
-    plataformaE();
-    desenhaRefens();
-    deposito();
-    plataformaD();
-
-    canhaoAtira(origemCanhao0, 20);      // Canhao Dispara
-    canhaoMovendo[0] = 1;                // Canhao 0 em movimento para recarregar
-    moveCanhaoD2E(origemCanhao0, 23, 0); // Canhao 0 vai recarregar
-    canhaoMovendo[0] = 0;                // Canhao 0 parado
-    Sleep(1000);                         // Carregando canhao 0
-
-    canhaoMovendo[0] = 1; // Canhao 0 em movimento
-    moveCanhaoE2D(23, origemCanhao0, 0);
-    canhaoMovendo[0] = 0;           // Canhao 0 parado
-    canhaoAtira(origemCanhao0, 20); // Canhao 0 Dispara
-
-    canhaoAtira(origemCanhao1, 20);
-    canhaoMovendo[1] = 1;                // Canhao 1 em movimento
-    moveCanhaoD2E(origemCanhao1, 23, 1); // Canhao 0 vai recarregar
-    canhaoAtira(origemCanhao0, 20);      // Canhao 0 Dispara (ele havia sido "apagado" por 1)
-    canhaoMovendo[1] = 0;                // Canhao 1 parado
-    Sleep(1000);                         // Carregando canhao 1
-
-    canhaoMovendo[1] = 1; // Canhao 1 em movimento
-    moveCanhaoE2D(23, origemCanhao1, 1);
-    canhaoAtira(origemCanhao0, 20); // Canhao 0 Dispara (ele havia sido "apagado" por 1)
-    canhaoMovendo[1] = 0;           // Canhao 1 parado
-    canhaoAtira(origemCanhao1, 20); // Canhao 1 Dispara
-
-    for (int i = 0; i < 7; i++)
-    { // Bombas explodem no ar
-        explode_bomba((rand() % 70) + 10, (rand() % 10) + 4);
-        Sleep(1000);
+        printf("^"); // chão
     }
 
-    while (contaRefem)
+    while (1)
     {
-        contaRefem--; // Mais um refem buscado
-        desenhaRefens();
-        for (coluna = 0; coluna < 100; coluna++)
+        apagaCanhao(x, y);
+        desenhaCanhao(x, y, posicao);
+        if (kbhit())
         {
-            helicopteroE2D(coluna, 0);
-            Sleep(100);
-            apaga_helicopteroE2D(coluna, 0);
+            // Captura a tecla pressionada
+            int tecla = getch();
+            switch (tecla)
+            {
+            case 224: // Tecla especial para setas no conio.h
+                tecla = getch();
+                switch (tecla)
+                {
+                case 75:                                  // Seta para a esquerda
+                    posicao = pressionouEsquerda(posicao); 
+                    break;
+                case 77:                            // Seta para a direita
+                    posicao = pressionouDireita(posicao); 
+                    break;
+                case 72: // Seta para cima
+                    posicao = NOVENTA_GRAUS;
+                    break;
+                }
+                break;
+            case 'q':
+            case 'Q':
+                return 0; // Encerra o programa ao pressionar 'q' ou 'Q'
+            }
         }
-        contaResgatado++; // Mais um refem resgatado
-        desenhaResgatados();
-        for (coluna = 99; coluna > 7; coluna--)
+
+        Sleep(200); // Pausa de 100ms entre cada atualização de tela (ajuste conforme necessário)
+    }
+
+    // canhaoAtira(origemCanhao, 20);      // Canhao Dispara
+
+    // for (int i = 0; i < 7; i++)
+    // { // Bombas explodem no ar
+    //     explode_bomba((rand() % 70) + 10, (rand() % 10) + 4);
+    //     Sleep(1000);
+    // }
+
+    while (numeroNaves)
+    {
+        int coluna = rand() % -87;
+        for (linha = 0; linha < 19; linha++)
         {
-            helicopteroD2E(coluna, 0);
-            Sleep(100);
-            apaga_helicopteroE2D(coluna, 0);
+
+            desenhaNave(coluna, linha);
+            Sleep(200);
+            apagaNave(coluna, linha);
         }
+        numeroNaves--;
     }
     getche();
 }
