@@ -1,0 +1,15 @@
+// parametros de dificuldade: numero de canhões, velocidade de descida das naves e quantidade de naves.
+
+// recarregar canhão (tempo?)
+
+// mover canhão(90, 45 direita, 45 esquerda, 180 direita, 180 esquerda.)
+
+// disparar foguete com espaço (threads)
+
+// criar nave (thread) (desce na vertical e inicia em uma posição x aleatoria definida no momento)
+
+// o jogo acaba quando: o jogador abateu ao menos 50% das naves (vitória do jogador)
+
+// OU
+
+// mais de 50% das naves chegou ao solo (derrota do jogador);
