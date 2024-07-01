@@ -4,6 +4,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <pthread.h>
+#include <stdbool.h>
 
 enum PosicaoCanhao
 {
@@ -14,9 +16,14 @@ enum PosicaoCanhao
     CENTO_E_OITENTA_GRAUS = 180
 };
 
-int origemCanhao = 53;
+struct Nave
+{
+    int x;
+    int y;
+    pthread_mutex_t mutex;
+};
 
-// Fun��o gotoxy
+// Funcao gotoxy
 void gotoxy(int x, int y)
 {
     COORD coord;
@@ -25,53 +32,18 @@ void gotoxy(int x, int y)
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-void explode_bomba(int x, int y)
-{
-    gotoxy(x, y);
-    printf("*");
-    Sleep(50);
-    printf(" ");
-    gotoxy(x, y - 1);
-    printf("O");
-    gotoxy(x - 1, y);
-    printf("O O");
-    gotoxy(x, y + 1);
-    printf("O");
-    Sleep(50);
-    gotoxy(x, y - 1);
-    printf(" ");
-    gotoxy(x - 1, y);
-    printf("   ");
-    gotoxy(x, y + 1);
-    printf(" ");
-
-    gotoxy(x, y - 2);
-    printf("o");
-    gotoxy(x - 2, y);
-    printf("o   o");
-    gotoxy(x, y + 2);
-    printf("o");
-    Sleep(50);
-    gotoxy(x, y - 2);
-    printf(" ");
-    gotoxy(x - 2, y);
-    printf("     ");
-    gotoxy(x, y + 2);
-    printf(" ");
-}
-
 void desenhaNave(int x, int y)
 {
     gotoxy(x, y);
-    printf("     _     \n");
+    printf("    _    \n");
     gotoxy(x, y + 1);
-    printf("   _( )_   \n");
+    printf("  _( )_  \n");
     gotoxy(x, y + 2);
-    printf("  /     \\  \n");
+    printf(" /     \\ \n");
     gotoxy(x, y + 3);
-    printf(" /_______\\ \n");
+    printf("/_______\\\n");
     gotoxy(x, y + 4);
-    printf("   |   |   \n");
+    printf("  |   |  \n");
 }
 
 void apagaNave(int x, int y)
@@ -140,90 +112,65 @@ void apagaCanhao(int x, int y)
     printf("       \n");
 }
 
-void canhaoAtira(int x, int y)
+int pressionouDireita(int posicaoAtual)
 {
-    int posicao;
-    time_t t;
-    gotoxy(x, y + 1);
-    printf(" ___+--+___");
-    gotoxy(x, y + 2);
-    printf("/          \\");
-    gotoxy(x, y + 3);
-    printf("\\          /");
-    gotoxy(x, y + 4);
-    printf(" -O-O--O-O-");
-    gotoxy(x, y);
-    srand((unsigned)time(&t));
-    for (int foguete = 3; foguete > 0; foguete--)
+    switch (posicaoAtual)
     {
-        posicao = (rand() % 3) - 1;
-        gotoxy(0, 28);
-        printf("%6d  %6d\n", foguete, posicao);
-        gotoxy(x, y);
-        switch (posicao)
+    case ZERO_GRAUS:
+        return ZERO_GRAUS;
+    case QUARENTA_CINCO_GRAUS:
+        return ZERO_GRAUS;
+    case NOVENTA_GRAUS:
+        return QUARENTA_CINCO_GRAUS;
+    case CENTO_E_TRINTA_CINCO_GRAUS:
+        return NOVENTA_GRAUS;
+    case CENTO_E_OITENTA_GRAUS:
+        return CENTO_E_TRINTA_CINCO_GRAUS;
+    }
+}
+
+int pressionouEsquerda(int posicaoAtual)
+{
+    switch (posicaoAtual)
+    {
+    case ZERO_GRAUS:
+        return QUARENTA_CINCO_GRAUS;
+    case QUARENTA_CINCO_GRAUS:
+        return NOVENTA_GRAUS;
+    case NOVENTA_GRAUS:
+        return CENTO_E_TRINTA_CINCO_GRAUS;
+    case CENTO_E_TRINTA_CINCO_GRAUS:
+        return CENTO_E_OITENTA_GRAUS;
+    case CENTO_E_OITENTA_GRAUS:
+        return CENTO_E_OITENTA_GRAUS;
+    }
+}
+
+void *threadNave(void *arg)
+{
+    struct Nave *disco = (struct Nave *)arg;
+    while (1)
+    {
+
+        pthread_mutex_lock(&disco->mutex);
+        apagaNave(disco->x, disco->y);
+        disco->y += 1;
+        if (disco->y > 23)
         {
-        case -1:
-            printf("     \\\\\n");
+            apagaNave(disco->x, disco->y);
+            pthread_mutex_unlock(&disco->mutex);
             break;
-        case 0:
-            printf("     ||");
-            break;
-        case 1:
-            printf("     //");
         }
-        bomba(x + 5, y - 1, posicao);
+        desenhaNave(disco->x, disco->y);
+        pthread_mutex_unlock(&disco->mutex);
+        Sleep(200);
     }
+    return NULL;
 }
 
-int pressionouDireita(int posicaoAtual){
-    switch (posicaoAtual)
-    {
-    case ZERO_GRAUS:
-        return ZERO_GRAUS;
-    case QUARENTA_CINCO_GRAUS:
-        return ZERO_GRAUS;
-    case NOVENTA_GRAUS:
-        return QUARENTA_CINCO_GRAUS;
-    case CENTO_E_TRINTA_CINCO_GRAUS:
-        return NOVENTA_GRAUS;
-    case CENTO_E_OITENTA_GRAUS:
-        return CENTO_E_TRINTA_CINCO_GRAUS;
-    }
-}
-
-int pressionouEsquerda(int posicaoAtual){
-    switch (posicaoAtual)
-    {
-    case ZERO_GRAUS:
-        return QUARENTA_CINCO_GRAUS;
-    case QUARENTA_CINCO_GRAUS:
-        return NOVENTA_GRAUS;
-    case NOVENTA_GRAUS:
-        return CENTO_E_TRINTA_CINCO_GRAUS;
-    case CENTO_E_TRINTA_CINCO_GRAUS:
-        return CENTO_E_OITENTA_GRAUS;
-    case CENTO_E_OITENTA_GRAUS:
-        return CENTO_E_OITENTA_GRAUS;
-    }
-}
-
-int main()
+void iniciaCanhao(int x, int y)
 {
     enum PosicaoCanhao posicao = NOVENTA_GRAUS;
-    int x = 59; // Posição inicial x do canhão
-    int y = 27; // Posição inicial y do canhao
-    int linha, coluna = 0;
-    int numeroFoguetes = 5;
-    int numeroNaves = 5;
-
-    system("cls");
-
-    gotoxy(0, 28);
-    for (coluna = 0; coluna < 120; coluna++)
-    {
-        printf("^"); // chão
-    }
-
     while (1)
     {
         apagaCanhao(x, y);
@@ -238,11 +185,11 @@ int main()
                 tecla = getch();
                 switch (tecla)
                 {
-                case 75:                                  // Seta para a esquerda
-                    posicao = pressionouEsquerda(posicao); 
+                case 75: // Seta para a esquerda
+                    posicao = pressionouEsquerda(posicao);
                     break;
-                case 77:                            // Seta para a direita
-                    posicao = pressionouDireita(posicao); 
+                case 77: // Seta para a direita
+                    posicao = pressionouDireita(posicao);
                     break;
                 case 72: // Seta para cima
                     posicao = NOVENTA_GRAUS;
@@ -251,32 +198,54 @@ int main()
                 break;
             case 'q':
             case 'Q':
-                return 0; // Encerra o programa ao pressionar 'q' ou 'Q'
+                break;
             }
         }
-
-        Sleep(200); // Pausa de 100ms entre cada atualização de tela (ajuste conforme necessário)
+        Sleep(100); // Pausa de 100ms entre cada atualização de tela (ajuste conforme necessário)
     }
+}
 
-    // canhaoAtira(origemCanhao, 20);      // Canhao Dispara
+int main()
+{
+    int x = 59; // Posição inicial x do canhão
+    int y = 27; // Posição inicial y do canhao
+    int linha, coluna = 0;
+    int numeroFoguetes = 5;
+    int numeroNaves = 5;
 
-    // for (int i = 0; i < 7; i++)
-    // { // Bombas explodem no ar
-    //     explode_bomba((rand() % 70) + 10, (rand() % 10) + 4);
-    //     Sleep(1000);
-    // }
+    system("cls");
 
-    while (numeroNaves)
+    gotoxy(0, 28);
+    for (coluna = 0; coluna < 120; coluna++)
     {
-        int coluna = rand() % -87;
-        for (linha = 0; linha < 19; linha++)
-        {
-
-            desenhaNave(coluna, linha);
-            Sleep(200);
-            apagaNave(coluna, linha);
-        }
-        numeroNaves--;
+        printf("^"); // chão
     }
+
+    //iniciaCanhao(x, y); // deve ser uma thread.
+
+    //thread para as bombas
+
+    struct Nave naves[numeroNaves];
+    pthread_t threads[numeroNaves];
+    bool colunasOcupadas[109] = {false};
+
+    srand(time(NULL));
+
+    for (int i = 0; i < numeroNaves; i++)
+    {
+        int x;
+        do
+        {
+            x = rand() % 109;
+        } while (colunasOcupadas[x] || colunasOcupadas[x + 1] || colunasOcupadas[x + 2] ||
+                 colunasOcupadas[x + 3] || colunasOcupadas[x + 4] || colunasOcupadas[x + 5] ||
+                 colunasOcupadas[x + 6] || colunasOcupadas[x + 7] || colunasOcupadas[x + 8]);
+        naves[i].x = x;
+        naves[i].y = 0;
+        pthread_mutex_init(&naves[i].mutex, NULL);
+        pthread_create(&threads[i], NULL, threadNave, (void *)&naves[i]);
+        Sleep(1500);
+    }
+
     getche();
 }
