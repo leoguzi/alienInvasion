@@ -156,16 +156,16 @@ void *atualizaContatores()
         gotoxy(20, 27);
         printf("Bombas disponiveis: %d", bombasDisponiveis);
         pthread_mutex_unlock(&mutexGotoxy);
-        Sleep(100);
+        Sleep(50);
     }
 }
 
 void finalizaJogoPerdeu()
 {
-    pthread_mutex_lock(&mutexGotoxy);
+    
     gotoxy(0, 29);
     printf("Fim de jogo! Voce perdeu!\n");
-    pthread_mutex_unlock(&mutexGotoxy);
+    
     exit(0);
 }
 
@@ -193,7 +193,7 @@ void *threadNave(void *arg)
 
         if (y > 20)
         {
-            pthread_mutex_unlock(&mutexGotoxy);
+            pthread_mutex_lock(&mutexGotoxy);
             apagaNave(x, y);
             pthread_mutex_unlock(&mutexGotoxy);
             pthread_mutex_lock(&mutexNaves);
@@ -201,7 +201,9 @@ void *threadNave(void *arg)
             pthread_mutex_unlock(&mutexNaves);
             if (navesChegaram >= MAX_NAVES / 2)
             {
+                pthread_mutex_lock(&mutexGotoxy);
                 finalizaJogoPerdeu();
+                pthread_mutex_unlock(&mutexGotoxy);
             }
             pthread_exit(NULL);
             break;
