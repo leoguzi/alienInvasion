@@ -178,13 +178,13 @@ void *threadNave(void *arg)
 
     while (1)
     {
-        pthread_mutex_lock(&mutexColisao);
-        if (!naves[*idx].ativo)
-        {
-            pthread_mutex_unlock(&mutexColisao);
-            pthread_exit(NULL);
-        }
-        pthread_mutex_unlock(&mutexColisao);
+        // pthread_mutex_lock(&mutexColisao);
+        // if (!naves[*idx].ativo)
+        // {
+        //     pthread_mutex_unlock(&mutexColisao);
+        //     pthread_exit(NULL);
+        // }
+        // pthread_mutex_unlock(&mutexColisao);
         pthread_mutex_lock(&mutexGotoxy);
         apagaNave(x, y);
         pthread_mutex_unlock(&mutexGotoxy);
@@ -209,10 +209,10 @@ void *threadNave(void *arg)
         pthread_mutex_lock(&mutexGotoxy);
         desenhaNave(x, y);
         pthread_mutex_unlock(&mutexGotoxy);
-        pthread_mutex_lock(&mutexColisao);
-        naves[*idx].x = x;
-        naves[*idx].y = y;
-        pthread_mutex_unlock(&mutexColisao);
+        // pthread_mutex_lock(&mutexColisao);
+        // naves[*idx].x = x;
+        // naves[*idx].y = y;
+        // pthread_mutex_unlock(&mutexColisao);
 
         Sleep(500);
     }
@@ -266,13 +266,13 @@ void *movimentaBomba(void *arg)
     };
     while (1)
     {
-        pthread_mutex_lock(&mutexColisao);
-        if (!bombas[*idx].ativo)
-        {
-            pthread_mutex_unlock(&mutexColisao);
-            pthread_exit(NULL);
-        }
-        pthread_mutex_unlock(&mutexColisao);
+        // pthread_mutex_lock(&mutexColisao);
+        // if (!bombas[*idx].ativo)
+        // {
+        //     pthread_mutex_unlock(&mutexColisao);
+        //     pthread_exit(NULL);
+        // }
+        // pthread_mutex_unlock(&mutexColisao);
         pthread_mutex_lock(&mutexGotoxy);
         apagaBomba(x, y);
         pthread_mutex_unlock(&mutexGotoxy);
@@ -306,10 +306,10 @@ void *movimentaBomba(void *arg)
         desenhaBomba(x, y);
         pthread_mutex_unlock(&mutexGotoxy);
 
-        pthread_mutex_lock(&mutexColisao);
-        bombas[*idx].x = x;
-        bombas[*idx].y = y;
-        pthread_mutex_unlock(&mutexColisao);
+        // pthread_mutex_lock(&mutexColisao);
+        // bombas[*idx].x = x;
+        // bombas[*idx].y = y;
+        // pthread_mutex_unlock(&mutexColisao);
 
         Sleep(30);
     }
@@ -418,6 +418,23 @@ void *verificaColisao()
     }
 }
 
+void inicializaObjetos(){
+    for (int i = 0; i < MAX_NAVES; i++)
+    {   
+        naves[i].x = 0;
+        naves[i].y = 0;
+        naves[i].ativo = false;
+    }
+
+    for (int i = 0; i < MAX_BOMBAS; i++)
+    {
+        bombas[i].x = 0;
+        bombas[i].y = 0;
+        bombas[i].ativo = false;
+    }
+
+}
+
 int main()
 {
     system("cls");
@@ -436,8 +453,8 @@ int main()
     pthread_t threadCanhao;
     pthread_create(&threadCanhao, NULL, iniciaCanhao, NULL);
 
-    pthread_t threadColisao;
-    pthread_create(&threadColisao, NULL, verificaColisao, NULL);
+    // pthread_t threadColisao;
+    // pthread_create(&threadColisao, NULL, verificaColisao, NULL);
 
     // thread para as bombas
 
