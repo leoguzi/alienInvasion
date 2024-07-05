@@ -255,15 +255,6 @@ void *movimentaBomba(void *arg)
     int x = CANHAO_X - 1;
     int y = CANHAO_Y;
     const int posicaoCanhaoThread = posicaoCanhao;
-
-    pthread_mutex_lock(&mutexBombas);
-    bombasDisponiveis--;
-    if (bombasDisponiveis == 0)
-    {
-        pthread_mutex_unlock(&mutexBombas);
-        recarregaCanhao();
-    };
-    pthread_mutex_unlock(&mutexBombas);
     while (1)
     {
         // pthread_mutex_lock(&mutexColisao);
@@ -335,7 +326,17 @@ void disparaBomba()
     }
     pthread_create(&threadBomba, NULL, movimentaBomba, idx);
     pthread_detach(threadBomba);
+
     //pthread_mutex_unlock(&mutexColisao);
+
+    pthread_mutex_lock(&mutexBombas);
+    bombasDisponiveis--;
+    if (bombasDisponiveis == 0)
+    {
+        pthread_mutex_unlock(&mutexBombas);
+        recarregaCanhao();
+    };
+    pthread_mutex_unlock(&mutexBombas);
 }
 
 void *iniciaCanhao()
