@@ -20,7 +20,7 @@ enum PosicaoCanhao
 #define MAX_BOMBAS 5
 #define TEMPO_RECARGA 4
 #define CANHAO_X 59
-#define CANHAO_Y 25
+#define CANHAO_Y 24
 
 int bombasDisponiveis = 0;
 
@@ -45,7 +45,6 @@ pthread_mutex_t mutexColisao;
 // Funcao gotoxy
 void gotoxy(int x, int y)
 {
-
     COORD coord;
     coord.X = x;
     coord.Y = y;
@@ -162,10 +161,8 @@ void *atualizaContatores()
 
 void finalizaJogoPerdeu()
 {
-    
     gotoxy(0, 29);
     printf("Fim de jogo! Voce perdeu!\n");
-    
     exit(0);
 }
 
@@ -272,6 +269,9 @@ void *movimentaBomba(void *arg)
         // pthread_mutex_lock(&mutexColisao);
         // if (!bombas[*idx].ativo)
         // {
+        //     pthread_mutex_lock(&mutexGotoxy);
+        //     apagaBomba(x, y);
+        //     pthread_mutex_unlock(&mutexGotoxy);
         //     pthread_mutex_unlock(&mutexColisao);
         //     pthread_exit(NULL);
         // }
@@ -322,6 +322,7 @@ void *movimentaBomba(void *arg)
 void disparaBomba()
 {
     pthread_t threadBomba;
+    //pthread_mutex_lock(&mutexColisao);
     int *idx = malloc(sizeof(int));
     for (int i = 0; i < MAX_BOMBAS; i++)
     {
@@ -334,6 +335,7 @@ void disparaBomba()
     }
     pthread_create(&threadBomba, NULL, movimentaBomba, idx);
     pthread_detach(threadBomba);
+    //pthread_mutex_unlock(&mutexColisao);
 }
 
 void *iniciaCanhao()
@@ -388,7 +390,6 @@ void *verificaColisao()
 {
     while (1)
     {
-
         pthread_mutex_lock(&mutexColisao);
         for (int i = 0; i < MAX_NAVES; i++)
         {
@@ -406,24 +407,20 @@ void *verificaColisao()
                             pthread_mutex_lock(&mutexNaves);
                             navesDestruidas++;
                             pthread_mutex_unlock(&mutexNaves);
-                            pthread_mutex_lock(&mutexGotoxy);
-                            apagaNave(naves[i].x, naves[i].y);
-                            apagaBomba(bombas[j].x, bombas[j].y);
-                            pthread_mutex_unlock(&mutexGotoxy);
                         }
                     }
                 }
             }
         }
-
         pthread_mutex_unlock(&mutexColisao);
-        Sleep(150); // 50 ms
+        Sleep(50); // 50 ms
     }
 }
 
-void inicializaObjetos(){
+void inicializaObjetos()
+{
     for (int i = 0; i < MAX_NAVES; i++)
-    {   
+    {
         naves[i].x = 0;
         naves[i].y = 0;
         naves[i].ativo = false;
@@ -435,20 +432,19 @@ void inicializaObjetos(){
         bombas[i].y = 0;
         bombas[i].ativo = false;
     }
-
 }
 
 int main()
 {
     system("cls");
+
     pthread_mutex_lock(&mutexGotoxy);
     gotoxy(0, 26);
-    pthread_mutex_unlock(&mutexGotoxy);
-
     for (int coluna = 0; coluna < 120; coluna++)
     {
         printf("^"); // chão
     }
+    pthread_mutex_unlock(&mutexGotoxy);
 
     pthread_t threadContadores;
     pthread_create(&threadContadores, NULL, atualizaContatores, NULL);
@@ -459,15 +455,18 @@ int main()
     // pthread_t threadColisao;
     // pthread_create(&threadColisao, NULL, verificaColisao, NULL);
 
-    // thread para as bombas
 
     int *idx = malloc(sizeof(int));
+    
     for (int i = 0; i < MAX_NAVES; i++)
     {
+        //pthread_mutex_lock(&mutexColisao);
         pthread_t novaNave;
         *idx = i;
         naves[i].ativo = true;
         pthread_create(&novaNave, NULL, threadNave, idx);
+        pthread_detach(novaNave);
+        //pthread_mutex_unlock(&mutexColisao);
         Sleep(3000);
     }
 
