@@ -261,11 +261,12 @@ void *movimentaBomba(void *arg)
 
     pthread_mutex_lock(&mutexBombas);
     bombasDisponiveis--;
-    pthread_mutex_unlock(&mutexBombas);
     if (bombasDisponiveis == 0)
     {
+        pthread_mutex_unlock(&mutexBombas);
         recarregaCanhao();
     };
+    pthread_mutex_unlock(&mutexBombas);
     while (1)
     {
         // pthread_mutex_lock(&mutexColisao);
